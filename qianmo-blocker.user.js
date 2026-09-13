@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         阡陌居板块屏蔽助手
-// @namespace    https://www.1000qm.vip/
-// @version      1.1
-// @description  在阡陌居所有版块列表按分类/作者屏蔽帖子，设置本地持久化；每个作者名旁可一键拉黑。
-// @author       you
+// @namespace    https://github.com/caimttth3-eng/DDUserScript
+// @version      1.2
+// @description  在阡陌居(1000qm.vip)所有版块列表按分类/作者屏蔽帖子，设置本地持久化；每个作者名旁可一键拉黑。
+// @author       caimttth3-eng
 // @match        https://www.1000qm.vip/*
 // @grant        GM_setValue
 // @grant        GM_getValue
