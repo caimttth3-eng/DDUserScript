@@ -7,6 +7,7 @@
 // @match        https://www.1000qm.vip/*
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @license      MIT
 // ==/UserScript==
 
 (function () {
