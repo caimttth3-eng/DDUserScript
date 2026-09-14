@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         1000qm 屏蔽助手
 // @namespace    https://github.com/caimttth3-eng/DDUserScript
-// @version      1.4
+// @version      1.4.1
 // @description  在阡陌居(1000qm.vip)所有版块按分类/作者屏蔽帖子；首页自动签到+领每日威望红包。
 // @author       caimttth3-eng
 // @match        https://www.1000qm.vip/*
@@ -117,6 +117,11 @@
       #qm-fab{position:fixed;right:18px;bottom:18px;z-index:99999;width:44px;height:44px;border-radius:50%;
         background:#333;color:#fff;font-size:20px;line-height:44px;text-align:center;cursor:pointer;
         box-shadow:0 2px 8px rgba(0,0,0,.3);user-select:none;}
+      #qm-fab .qm-dot{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;
+        border:2px solid #fff;}
+      #qm-dot-done{background:#4caf50;}
+      #qm-dot-pending{background:#ff9800;}
+      #qm-dot-fail{background:#f44336;}
       #qm-panel{position:fixed;right:18px;bottom:72px;z-index:99999;width:320px;max-height:70vh;
         background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);
         display:none;flex-direction:column;font-size:13px;color:#333;}
@@ -141,6 +146,9 @@
     // 悬浮按钮
     const fab = document.createElement('div');
     fab.id = 'qm-fab'; fab.textContent = '🚫'; fab.title = '板块屏蔽设置';
+    const dot = document.createElement('span');
+    dot.className = 'qm-dot'; dot.id = 'qm-dot-pending';
+    fab.appendChild(dot);
     document.body.appendChild(fab);
 
     // 面板
@@ -268,7 +276,12 @@
   async function autoSign() {
     const today = new Date().toDateString();
     const lastSign = store.get(KEY_SIGN, '');
-    if (lastSign === today) return; // 今天已签过
+    const dot = document.querySelector('.qm-dot');
+
+    if (lastSign === today) {
+      if (dot) dot.id = 'qm-dot-done';
+      return; // 今天已签过
+    }
 
     try {
       // 1. 获取签到页面和 formhash
@@ -301,11 +314,14 @@
       if (text.includes('签到成功') || text.includes('恭喜') || text.includes('已签到')) {
         store.set(KEY_SIGN, today);
         console.log('[1000qm] 签到成功:', words);
+        if (dot) dot.id = 'qm-dot-done';
       } else {
         console.warn('[1000qm] 签到响应:', text.slice(0, 200));
+        if (dot) dot.id = 'qm-dot-fail';
       }
     } catch (e) {
       console.error('[1000qm] 签到失败:', e);
+      if (dot) dot.id = 'qm-dot-fail';
     }
 
     // 4. 领每日威望红包（不管签到成功与否，都试一下）
