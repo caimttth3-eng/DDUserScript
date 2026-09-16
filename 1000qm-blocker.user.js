@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         1000qm 屏蔽助手
 // @namespace    https://github.com/caimttth3-eng/DDUserScript
-// @version      1.4.1
+// @version      1.4.2
 // @description  在阡陌居(1000qm.vip)所有版块按分类/作者屏蔽帖子；首页自动签到+领每日威望红包。
 // @author       caimttth3-eng
 // @match        https://www.1000qm.vip/*
@@ -109,9 +109,10 @@
     });
   }
 
-  /* ---------- 面板 ---------- */
-  function buildPanel() {
-    // 样式
+  /* ---------- 悬浮按钮（所有页面都创建） ---------- */
+  function createFab() {
+    if (document.getElementById('qm-fab')) return;
+
     const css = document.createElement('style');
     css.textContent = `
       #qm-fab{position:fixed;right:18px;bottom:18px;z-index:99999;width:44px;height:44px;border-radius:50%;
@@ -119,9 +120,25 @@
         box-shadow:0 2px 8px rgba(0,0,0,.3);user-select:none;}
       #qm-fab .qm-dot{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;
         border:2px solid #fff;}
-      #qm-dot-done{background:#4caf50;}
-      #qm-dot-pending{background:#ff9800;}
-      #qm-dot-fail{background:#f44336;}
+      #qm-dot-done{background:#4caf50 !important;}
+      #qm-dot-pending{background:#ff9800 !important;}
+      #qm-dot-fail{background:#f44336 !important;}
+    `;
+    document.head.appendChild(css);
+
+    const fab = document.createElement('div');
+    fab.id = 'qm-fab'; fab.textContent = '🚫'; fab.title = '板块屏蔽设置';
+    const dot = document.createElement('span');
+    dot.className = 'qm-dot'; dot.id = 'qm-dot-pending';
+    fab.appendChild(dot);
+    document.body.appendChild(fab);
+  }
+
+  /* ---------- 面板（仅列表页） ---------- */
+  function buildPanel() {
+    // 面板样式
+    const css = document.createElement('style');
+    css.textContent = `
       #qm-panel{position:fixed;right:18px;bottom:72px;z-index:99999;width:320px;max-height:70vh;
         background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);
         display:none;flex-direction:column;font-size:13px;color:#333;}
@@ -142,14 +159,6 @@
       #qm-panel .qm-toggle{cursor:pointer;float:right;color:#06c;}
     `;
     document.head.appendChild(css);
-
-    // 悬浮按钮
-    const fab = document.createElement('div');
-    fab.id = 'qm-fab'; fab.textContent = '🚫'; fab.title = '板块屏蔽设置';
-    const dot = document.createElement('span');
-    dot.className = 'qm-dot'; dot.id = 'qm-dot-pending';
-    fab.appendChild(dot);
-    document.body.appendChild(fab);
 
     // 面板
     const panel = document.createElement('div');
@@ -335,12 +344,15 @@
 
   /* ---------- 启动 ---------- */
   function boot() {
+    // 所有页面都创建悬浮按钮（首页也要显示签到状态灯）
+    createFab();
+
     // 首页自动签到 + 领红包
     if (location.pathname === '/forum.php' || location.pathname === '/') {
       autoSign();
     }
 
-    // 仅在版块列表页（有 #threadlisttableid）激活；主页/帖子详情/个人中心等静默
+    // 仅在版块列表页（有 #threadlisttableid）激活设置面板；主页/帖子详情/个人中心等静默
     if (!document.querySelector('#threadlisttableid')) return;
 
     buildPanel();
