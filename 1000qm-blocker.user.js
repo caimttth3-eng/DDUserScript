@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         1000qm 屏蔽助手
 // @namespace    https://github.com/caimttth3-eng/DDUserScript
-// @version      1.4.2
+// @version      1.4.3
 // @description  在阡陌居(1000qm.vip)所有版块按分类/作者屏蔽帖子；首页自动签到+领每日威望红包。
 // @author       caimttth3-eng
 // @match        https://www.1000qm.vip/*
@@ -110,8 +110,9 @@
   }
 
   /* ---------- 悬浮按钮（所有页面都创建） ---------- */
+  let fabEl = null;  // 全局引用，buildPanel 里要用
   function createFab() {
-    if (document.getElementById('qm-fab')) return;
+    if (document.getElementById('qm-fab')) { fabEl = document.getElementById('qm-fab'); return; }
 
     const css = document.createElement('style');
     css.textContent = `
@@ -126,12 +127,12 @@
     `;
     document.head.appendChild(css);
 
-    const fab = document.createElement('div');
-    fab.id = 'qm-fab'; fab.textContent = '🚫'; fab.title = '板块屏蔽设置';
+    fabEl = document.createElement('div');
+    fabEl.id = 'qm-fab'; fabEl.textContent = '🚫'; fabEl.title = '板块屏蔽设置';
     const dot = document.createElement('span');
     dot.className = 'qm-dot'; dot.id = 'qm-dot-pending';
-    fab.appendChild(dot);
-    document.body.appendChild(fab);
+    fabEl.appendChild(dot);
+    document.body.appendChild(fabEl);
   }
 
   /* ---------- 面板（仅列表页） ---------- */
@@ -183,7 +184,7 @@
     `;
     document.body.appendChild(panel);
 
-    fab.onclick = () => panel.classList.toggle('open');
+    fabEl.onclick = () => panel.classList.toggle('open');
     panel.querySelector('.qm-close').onclick = () => panel.classList.remove('open');
     panel.querySelector('#qm-reveal').onclick = (e) => {
       revealAll = !revealAll;
@@ -344,13 +345,9 @@
 
   /* ---------- 启动 ---------- */
   function boot() {
-    // 所有页面都创建悬浮按钮（首页也要显示签到状态灯）
+    // 所有页面都创建悬浮按钮 + 检查签到状态
     createFab();
-
-    // 首页自动签到 + 领红包
-    if (location.pathname === '/forum.php' || location.pathname === '/') {
-      autoSign();
-    }
+    autoSign();  // 所有页面都跑，已签过就直接显示绿色
 
     // 仅在版块列表页（有 #threadlisttableid）激活设置面板；主页/帖子详情/个人中心等静默
     if (!document.querySelector('#threadlisttableid')) return;
