@@ -54,7 +54,7 @@
 - **文件**：[bili-space-ip.user.js](./bili-space-ip.user.js)
 - **站点**：[哔哩哔哩](https://space.bilibili.com/)
 - **最新版本**：1.2
-- **Greasy Fork**：（发布后补）
+- **Greasy Fork**：https://greasyfork.org/zh-CN/scripts/603975
 
 在 B 站用户空间页把该用户的 IP 属地贴在用户名后面显示，不用再点进动态翻找。
 
